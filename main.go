@@ -5,15 +5,15 @@ import (
 	"net/http"
 )
 
-type InMemoryAssetAmount struct{}
+//type InMemoryAssetStore struct{}
 
-func (i *InMemoryAssetAmount) RecordAmount(name string) {}
+//func (i *InMemoryAssetStore) RecordAmount(name string) {}
 
-func (i *InMemoryAssetAmount) GetAssetAmount(name string) int {
-	return 123
-}
+//func (i *InMemoryAssetStore) GetAssetAmount(name string) int {
+//	return 123
+//}
 
 func main() {
-	server := &AssetServer{&InMemoryAssetAmount{}}
+	server := &AssetServer{NewInMemoryAssetStore()}
 	log.Fatal(http.ListenAndServe(":5000", server))
 }
