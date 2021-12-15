@@ -16,18 +16,17 @@ type AssetServer struct {
 }
 
 func (a *AssetServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	
+	asset := strings.TrimPrefix(r.URL.Path, "/assets/")
+
 	switch r.Method {
 		case http.MethodPost:
-			a.processAmount(w)
+			a.processAmount(w, asset)
 		case http.MethodGet:
-			a.showAmount(w, r)
+			a.showAmount(w, asset)
 	}
 }
 
-func (a *AssetServer) showAmount(w http.ResponseWriter, r *http.Request) {
-	asset := strings.TrimPrefix(r.URL.Path, "/assets/")
-
+func (a *AssetServer) showAmount(w http.ResponseWriter, asset string) {
 	amount := a.store.GetAssetAmount(asset)
 
 	if amount == 0 {
@@ -37,8 +36,8 @@ func (a *AssetServer) showAmount(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, amount)
 }
 
-func (a *AssetServer) processAmount(w http.ResponseWriter) {
-	a.store.RecordAmount("RealEstate")
+func (a *AssetServer) processAmount(w http.ResponseWriter, asset string) {
+	a.store.RecordAmount(asset)
 	w.WriteHeader(http.StatusAccepted)
 }
 

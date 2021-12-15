@@ -69,8 +69,10 @@ func TestStoreAmounts(t *testing.T) {
 	}
 	server := &AssetServer{&store}
 
-	t.Run("it returns accepted on POST", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodPost, "/assets/Stonks", nil)
+	t.Run("it records wins on POST", func(t *testing.T) {
+		asset := "Stonks"
+
+		request := newPostAmountRequest(asset)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -78,7 +80,11 @@ func TestStoreAmounts(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusAccepted)
 
 		if len(store.amountCalls) != 1 {
-			t.Errorf("got %d calls to RecordWin want %d", len(store.amountCalls), 1)
+			t.Fatalf("got %d calls to RecordWin want %d", len(store.amountCalls), 1)
+		}
+
+		if store.amountCalls[0] != asset {	
+			t.Errorf("did not store correct winner got %q want %q", store.amountCalls[0], asset)
 		}
 	})
 }
