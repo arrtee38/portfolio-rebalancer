@@ -7,6 +7,8 @@ import (
 
 type InMemoryAssetAmount struct{}
 
+func (i *InMemoryAssetAmount) RecordAmount(name string) {}
+
 func (i *InMemoryAssetAmount) GetAssetAmount(name string) int {
 	return 123
 }
