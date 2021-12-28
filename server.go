@@ -16,6 +16,18 @@ type AssetServer struct {
 }
 
 func (a *AssetServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	router := http.NewServeMux()
+	router.Handle("/portfolio", http.HandlerFunc(a.portfolioHandler))
+	router.Handle("/assets/", http.HandlerFunc(a.assetHandler))
+
+	router.ServeHTTP(w, r)
+}
+
+func (a *AssetServer) portfolioHandler(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+}
+
+func (a *AssetServer) assetHandler(w http.ResponseWriter, r *http.Request) {
 	asset := strings.TrimPrefix(r.URL.Path, "/assets/")
 
 	switch r.Method {
@@ -24,7 +36,7 @@ func (a *AssetServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case http.MethodGet:
 			a.showAmount(w, asset)
 	}
-}
+} 
 
 func (a *AssetServer) showAmount(w http.ResponseWriter, asset string) {
 	amount := a.store.GetAssetAmount(asset)
@@ -39,16 +51,4 @@ func (a *AssetServer) showAmount(w http.ResponseWriter, asset string) {
 func (a *AssetServer) processAmount(w http.ResponseWriter, asset string) {
 	a.store.RecordAmount(asset)
 	w.WriteHeader(http.StatusAccepted)
-}
-
-func GetAssetAmount(name string) string {
-	if name == "Stonks" {
-		return "20"
-	}
-
-	if name == "Cryptos" {
-		return "10"
-	}
-
-	return ""
 }

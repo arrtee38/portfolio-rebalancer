@@ -89,6 +89,23 @@ func TestStoreAmounts(t *testing.T) {
 	})
 }
 
+func TestPortfolio (t *testing.T) {
+	store := StubAssetAmount{
+		//map[string]int{},
+		//nil,
+	}
+	server := &AssetServer{&store}
+
+	t.Run("it returns 200 on /portfolio", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/portfolio", nil)
+		response := httptest.NewRecorder()
+
+		server.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusOK)
+	})
+}
+
 func assertResponseBody(t testing.TB, got, want string) {
 	t.Helper()
 
