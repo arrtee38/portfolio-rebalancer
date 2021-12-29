@@ -22,14 +22,14 @@ func (a *StubAssetAmount) RecordAmount(name string) {
 }
 
 func TestGETAssets(t *testing.T) {
-	amount := StubAssetAmount{
+	store := StubAssetAmount{
 		map[string]int{
 			"Stonks": 20,
 			"Cryptos":  10,
 		},
 		nil,
 	}
-	server := &AssetServer{&amount}
+	server := NewAssetServer(&store)
 	
 	t.Run("returns amount of Stonks", func(t *testing.T) {
 		request := newGetAmountRequest("Stonks")
@@ -67,7 +67,7 @@ func TestStoreAmounts(t *testing.T) {
 		map[string]int{},
 		nil,
 	}
-	server := &AssetServer{&store}
+	server := NewAssetServer(&store)
 
 	t.Run("it records wins on POST", func(t *testing.T) {
 		asset := "Stonks"
@@ -90,11 +90,8 @@ func TestStoreAmounts(t *testing.T) {
 }
 
 func TestPortfolio (t *testing.T) {
-	store := StubAssetAmount{
-		//map[string]int{},
-		//nil,
-	}
-	server := &AssetServer{&store}
+	store := StubAssetAmount{}
+	server := NewAssetServer(&store)
 
 	t.Run("it returns 200 on /portfolio", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/portfolio", nil)

@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	server := &AssetServer{NewInMemoryAssetStore()}
+	server := NewAssetServer(NewInMemoryAssetStore())
 	log.Fatal(http.ListenAndServe(":5000", server))
 }

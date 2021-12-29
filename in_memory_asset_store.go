@@ -1,7 +1,5 @@
 package main
 
-//import "sync"
-
 func NewInMemoryAssetStore() *InMemoryAssetStore {
 	return &InMemoryAssetStore{map[string]int{}}
 }

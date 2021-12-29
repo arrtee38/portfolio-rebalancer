@@ -6,21 +6,28 @@ import (
 	"net/http"
 )
 
-type AssetAmount interface{
+type AssetAmount interface {
 	GetAssetAmount(name string) int
 	RecordAmount(name string)
 }
 
 type AssetServer struct {
 	store AssetAmount
+	http.Handler
 }
 
-func (a *AssetServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	router := http.NewServeMux()
-	router.Handle("/portfolio", http.HandlerFunc(a.portfolioHandler))
-	router.Handle("/assets/", http.HandlerFunc(a.assetHandler))
+func NewAssetServer(store AssetAmount) *AssetServer {
+	a := new(AssetServer)
 
-	router.ServeHTTP(w, r)
+	a.store = store 
+
+	router := http.NewServeMux()
+	router.Handle("/league", http.HandlerFunc(a.portfolioHandler))
+	router.Handle("/players/", http.HandlerFunc(a.assetHandler))
+
+	a.Handler = router
+
+	return a
 }
 
 func (a *AssetServer) portfolioHandler(w http.ResponseWriter, r *http.Request) {

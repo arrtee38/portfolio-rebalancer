@@ -8,7 +8,7 @@ import (
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	store := NewInMemoryAssetStore()
-	server := AssetServer{store}
+	server := NewAssetServer(store)
 	asset := "Stonks"
 
 	server.ServeHTTP(httptest.NewRecorder(), newPostAmountRequest(asset))
