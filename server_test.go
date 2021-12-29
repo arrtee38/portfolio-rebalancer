@@ -6,11 +6,13 @@ import (
 	"net/http/httptest"
 	"testing"
 	"encoding/json"
+	"reflect"
 )
 
 type StubAssetAmount struct {
 	amounts map[string]int
 	amountCalls []string
+	portfolio []Asset
 }
 
 func (a *StubAssetAmount) GetAssetAmount(name string) int {
@@ -22,12 +24,17 @@ func (a *StubAssetAmount) RecordAmount(name string) {
 	a.amountCalls = append(a.amountCalls, name)
 }
 
+func (a *StubAssetAmount) GetPortfolio() []Asset {
+	return a.portfolio
+}
+
 func TestGETAssets(t *testing.T) {
 	store := StubAssetAmount{
 		map[string]int{
 			"Stonks": 20,
 			"Cryptos":  10,
 		},
+		nil,
 		nil,
 	}
 	server := NewAssetServer(&store)
@@ -67,6 +74,7 @@ func TestStoreAmounts(t *testing.T) {
 	store := StubAssetAmount{
 		map[string]int{},
 		nil,
+		nil,
 	}
 	server := NewAssetServer(&store)
 
@@ -91,10 +99,21 @@ func TestStoreAmounts(t *testing.T) {
 }
 
 func TestPortfolio (t *testing.T) {
-	store := StubAssetAmount{}
-	server := NewAssetServer(&store)
 
 	t.Run("it returns 200 on /portfolio", func(t *testing.T) {
+		wantedPortfolio := []Asset{
+			{"Stonks", 41},
+			{"Cryptos", 52},
+			{"Real Estate", 7},
+		}
+		
+		store := StubAssetAmount{
+			nil,
+			nil,
+			wantedPortfolio,
+		}
+		server := NewAssetServer(&store)
+		
 		request, _ := http.NewRequest(http.MethodGet, "/portfolio", nil)
 		response := httptest.NewRecorder()
 
@@ -109,6 +128,10 @@ func TestPortfolio (t *testing.T) {
 		}
 
 		assertStatus(t, response.Code, http.StatusOK)
+		
+		if !reflect.DeepEqual(got, wantedPortfolio) {
+			t.Errorf("got %v want %v", got, wantedPortfolio)
+		}
 	})
 }
 

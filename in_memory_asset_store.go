@@ -8,6 +8,10 @@ type InMemoryAssetStore struct {
 	store map[string]int
 }
 
+func (i *InMemoryAssetStore) GetPortfolio() []Asset {
+	return nil
+}
+
 func (i *InMemoryAssetStore) RecordAmount(name string) {
 	i.store[name]++
 }

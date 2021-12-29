@@ -10,6 +10,7 @@ import (
 type AssetAmount interface {
 	GetAssetAmount(name string) int
 	RecordAmount(name string)
+	GetPortfolio() []Asset
 }
 
 type AssetServer struct {
@@ -37,12 +38,7 @@ func NewAssetServer(store AssetAmount) *AssetServer {
 }
 
 func (a *AssetServer) portfolioHandler(w http.ResponseWriter, r *http.Request) {
-		portfolioAllocation := []Asset{
-			{"Stonks", 20},
-		}
-		
-		json.NewEncoder(w).Encode(portfolioAllocation)
-
+		json.NewEncoder(w).Encode(a.store.GetPortfolio())
 		w.WriteHeader(http.StatusOK)
 }
 
