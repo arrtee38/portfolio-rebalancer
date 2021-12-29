@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"net/http"
+	"encoding/json"
 )
 
 type AssetAmount interface {
@@ -27,8 +28,8 @@ func NewAssetServer(store AssetAmount) *AssetServer {
 	a.store = store 
 
 	router := http.NewServeMux()
-	router.Handle("/league", http.HandlerFunc(a.portfolioHandler))
-	router.Handle("/players/", http.HandlerFunc(a.assetHandler))
+	router.Handle("/portfolio", http.HandlerFunc(a.portfolioHandler))
+	router.Handle("/assets/", http.HandlerFunc(a.assetHandler))
 
 	a.Handler = router
 
@@ -36,6 +37,12 @@ func NewAssetServer(store AssetAmount) *AssetServer {
 }
 
 func (a *AssetServer) portfolioHandler(w http.ResponseWriter, r *http.Request) {
+		portfolioAllocation := []Asset{
+			{"Stonks", 20},
+		}
+		
+		json.NewEncoder(w).Encode(portfolioAllocation)
+
 		w.WriteHeader(http.StatusOK)
 }
 
