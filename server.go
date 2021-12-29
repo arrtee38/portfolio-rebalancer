@@ -16,6 +16,11 @@ type AssetServer struct {
 	http.Handler
 }
 
+type Asset struct {
+	Name string
+	Amount float64
+}
+
 func NewAssetServer(store AssetAmount) *AssetServer {
 	a := new(AssetServer)
 
