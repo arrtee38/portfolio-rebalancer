@@ -23,6 +23,8 @@ type Asset struct {
 	Amount float64
 }
 
+const jsonContentType = "application/json"
+
 func NewAssetServer(store AssetAmount) *AssetServer {
 	a := new(AssetServer)
 
@@ -38,8 +40,8 @@ func NewAssetServer(store AssetAmount) *AssetServer {
 }
 
 func (a *AssetServer) portfolioHandler(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", jsonContentType)
 		json.NewEncoder(w).Encode(a.store.GetPortfolio())
-		w.WriteHeader(http.StatusOK)
 }
 
 func (a *AssetServer) assetHandler(w http.ResponseWriter, r *http.Request) {

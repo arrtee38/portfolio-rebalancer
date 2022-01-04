@@ -123,7 +123,16 @@ func TestPortfolio (t *testing.T) {
 		got := getPortfolioFromResponse(t, response.Body)
 		assertStatus(t, response.Code, http.StatusOK)
 		assertPortfolio(t, got, wantedPortfolio)
+		assertContentType(t, response, jsonContentType)
+
 	})
+}
+
+func assertContentType(t testing.TB, response *httptest.ResponseRecorder, want string) {
+		t.Helper()
+		if response.Result().Header.Get("content-type") != want {
+			t.Errorf("response did not have content-type of %s, got %v", want, response.Result().Header)
+		}
 }
 
 func assertPortfolio(t testing.TB, got, want []Asset) {
