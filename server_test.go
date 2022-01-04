@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -114,30 +115,36 @@ func TestPortfolio (t *testing.T) {
 		}
 		server := NewAssetServer(&store)
 		
-		request, _ := http.NewRequest(http.MethodGet, "/portfolio", nil)
+		request := newPortfolioRequest()
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 		
-		var got []Asset
-
-		err := json.NewDecoder(response.Body).Decode(&got)
-
-		if err != nil {
-			t.Fatalf("Unable to parse response from server %q into slice of Asset, '%v'", response.Body, err)
-		}
-
+		got := getPortfolioFromResponse(t, response.Body)
 		assertStatus(t, response.Code, http.StatusOK)
-		
-		if !reflect.DeepEqual(got, wantedPortfolio) {
-			t.Errorf("got %v want %v", got, wantedPortfolio)
-		}
+		assertPortfolio(t, got, wantedPortfolio)
 	})
+}
+
+func assertPortfolio(t testing.TB, got, want []Asset) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func getPortfolioFromResponse(t testing.TB, body io.Reader) (portfolio []Asset) {
+	t.Helper()
+	err := json.NewDecoder(body).Decode(&portfolio)
+
+	if err != nil {
+		t.Fatalf("Unable to parse response from server %q into slice of Asset, '%v'", body, err)
+	}
+	return
 }
 
 func assertResponseBody(t testing.TB, got, want string) {
 	t.Helper()
-
 	if got != want {
 		t.Errorf("response body is wrong, got %q want %q", got, want)
 	}
@@ -145,9 +152,9 @@ func assertResponseBody(t testing.TB, got, want string) {
 
 func assertStatus(t testing.TB, got, want int) {
 	t.Helper()
-		if got != want {
-			t.Errorf("did not get correct status, got %d, want %d", got, want)
-		}
+	if got != want {
+		t.Errorf("did not get correct status, got %d, want %d", got, want)
+	}
 }
 
 func newGetAmountRequest(name string) *http.Request {
@@ -159,3 +166,10 @@ func newPostAmountRequest(name string) *http.Request {
 	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/assets/%s", name), nil)
 	return req
 }
+
+func newPortfolioRequest() *http.Request {
+	req, _ := http.NewRequest(http.MethodGet, "/portfolio", nil)
+	return req
+}
+
+
