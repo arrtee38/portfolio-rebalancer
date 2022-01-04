@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestRecordingWinsAndRetrievingThem(t *testing.T) {
+func TestRecordingAssetsAndRetrievingThem(t *testing.T) {
 	store := NewInMemoryAssetStore()
 	server := NewAssetServer(store)
 	asset := "Stonks"
@@ -30,7 +30,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 
 		got := getPortfolioFromResponse(t, response.Body)
 		want := []Asset{
-			{"Stonks", 3},
+			{"Stonks", 3.0},
 		}
 		assertPortfolio(t, got, want)
 	})

@@ -1,11 +1,11 @@
 package main
 
 func NewInMemoryAssetStore() *InMemoryAssetStore {
-	return &InMemoryAssetStore{map[string]int{}}
+	return &InMemoryAssetStore{map[string]float64{}}
 }
 
 type InMemoryAssetStore struct {
-	store map[string]int
+	store map[string]float64
 }
 
 func (i *InMemoryAssetStore) GetPortfolio() []Asset {
@@ -21,6 +21,6 @@ func (i *InMemoryAssetStore) RecordAmount(name string) {
 	i.store[name]++
 }
 
-func (i *InMemoryAssetStore) GetAssetAmount(name string) int {
+func (i *InMemoryAssetStore) GetAssetAmount(name string) float64 {
 	return i.store[name]
 }

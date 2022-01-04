@@ -8,7 +8,7 @@ import (
 )
 
 type AssetAmount interface {
-	GetAssetAmount(name string) int
+	GetAssetAmount(name string) float64
 	RecordAmount(name string)
 	GetPortfolio() []Asset
 }
@@ -20,7 +20,7 @@ type AssetServer struct {
 
 type Asset struct {
 	Name string
-	Amount int
+	Amount float64
 }
 
 const jsonContentType = "application/json"
@@ -58,7 +58,7 @@ func (a *AssetServer) assetHandler(w http.ResponseWriter, r *http.Request) {
 func (a *AssetServer) showAmount(w http.ResponseWriter, asset string) {
 	amount := a.store.GetAssetAmount(asset)
 
-	if amount == 0 {
+	if amount == 0.0 {
 		w.WriteHeader(http.StatusNotFound)
 	}
 

@@ -11,12 +11,12 @@ import (
 )
 
 type StubAssetAmount struct {
-	amounts map[string]int
+	amounts map[string]float64
 	amountCalls []string
 	portfolio []Asset
 }
 
-func (a *StubAssetAmount) GetAssetAmount(name string) int {
+func (a *StubAssetAmount) GetAssetAmount(name string) float64 {
 	amount := a.amounts[name]
 	return amount
 }
@@ -31,9 +31,9 @@ func (a *StubAssetAmount) GetPortfolio() []Asset {
 
 func TestGETAssets(t *testing.T) {
 	store := StubAssetAmount{
-		map[string]int{
-			"Stonks": 20,
-			"Cryptos":  10,
+		map[string]float64{
+			"Stonks": 20.0,
+			"Cryptos":  10.0,
 		},
 		nil,
 		nil,
@@ -73,13 +73,13 @@ func TestGETAssets(t *testing.T) {
 
 func TestStoreAmounts(t *testing.T) {
 	store := StubAssetAmount{
-		map[string]int{},
+		map[string]float64{},
 		nil,
 		nil,
 	}
 	server := NewAssetServer(&store)
 
-	t.Run("it records wins on POST", func(t *testing.T) {
+	t.Run("it records amounts on POST", func(t *testing.T) {
 		asset := "Stonks"
 
 		request := newPostAmountRequest(asset)
@@ -90,11 +90,11 @@ func TestStoreAmounts(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusAccepted)
 
 		if len(store.amountCalls) != 1 {
-			t.Fatalf("got %d calls to RecordWin want %d", len(store.amountCalls), 1)
+			t.Fatalf("got %d calls to RecordAmounts want %d", len(store.amountCalls), 1)
 		}
 
 		if store.amountCalls[0] != asset {	
-			t.Errorf("did not store correct winner got %q want %q", store.amountCalls[0], asset)
+			t.Errorf("did not store correct amount got %q want %q", store.amountCalls[0], asset)
 		}
 	})
 }
@@ -103,9 +103,9 @@ func TestPortfolio (t *testing.T) {
 
 	t.Run("it returns 200 on /portfolio", func(t *testing.T) {
 		wantedPortfolio := []Asset{
-			{"Stonks", 41},
-			{"Cryptos", 52},
-			{"Real Estate", 7},
+			{"Stonks", 41.0},
+			{"Cryptos", 52.0},
+			{"Real Estate", 7.0},
 		}
 		
 		store := StubAssetAmount{
