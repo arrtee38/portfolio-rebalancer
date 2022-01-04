@@ -9,7 +9,12 @@ type InMemoryAssetStore struct {
 }
 
 func (i *InMemoryAssetStore) GetPortfolio() []Asset {
-	return nil
+	var portfolio []Asset
+	for name, amount := range i.store {
+		portfolio = append(portfolio, Asset{name, amount})
+	}
+
+	return portfolio
 }
 
 func (i *InMemoryAssetStore) RecordAmount(name string) {

@@ -20,7 +20,7 @@ type AssetServer struct {
 
 type Asset struct {
 	Name string
-	Amount float64
+	Amount int
 }
 
 const jsonContentType = "application/json"
