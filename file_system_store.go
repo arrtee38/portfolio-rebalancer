@@ -9,33 +9,30 @@ type FileSystemAssetStore struct {
 	database io.ReadWriteSeeker
 }
 
-func (f *FileSystemAssetStore) GetPortfolio() []Asset {
+func (f *FileSystemAssetStore) GetPortfolio() Portfolio {
 	f.database.Seek(0, 0)
 	portfolio, _ := NewPortfolio(f.database)
 	return portfolio
 }
 
 func (f *FileSystemAssetStore) GetAssetAmount(name string) float64 {
-	var amount float64
+	asset := f.GetPortfolio().Find(name)
 	
-	for _, asset := range f.GetPortfolio() {
-		if asset.Name == name {
-			amount = asset.Amount
-			break
-		}
+	if asset != nil {
+		return asset.Amount
 	}
 	
-	return amount
+	return 0
 }
 
 func (f *FileSystemAssetStore) RecordAmount(name string) {
 	portfolio := f.GetPortfolio()
+	asset := portfolio.Find(name)
 	
-	for i, asset := range portfolio {
-		if asset.Name == name {
-			portfolio[i].Amount += 1.0
-		}
+	if asset != nil {
+		asset.Amount += 1.0
 	}
+
 	f.database.Seek(0, 0)
 	json.NewEncoder(f.database).Encode(portfolio)
 }
