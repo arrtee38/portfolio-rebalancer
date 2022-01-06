@@ -2,13 +2,17 @@ package main
 
 import (
 	"testing"
-	"strings"
+	"io"
+	"io/ioutil"
+	"os"
 )
 
 func TestFileSystemStore(t *testing.T) {
-	database := strings.NewReader(`[
+	database, cleanDatabase := createTempFile(t, `[
             {"Name": "Stonks", "Amount": 30.0},
             {"Name": "Cryptos", "Amount": 70.0}]`)
+	defer cleanDatabase()
+
 	store := FileSystemAssetStore{database}
 		
 	t.Run("portfolio from a reader", func(t *testing.T) {
@@ -28,13 +32,41 @@ func TestFileSystemStore(t *testing.T) {
 
 	t.Run("get player score", func(t *testing.T) {
 		got := store.GetAssetAmount("Cryptos")
-		assertAssetAmount(t, got, 70.0)
+		want := 70.0
+		assertAmountEquals(t, got, want)
+	})
+
+	t.Run("store amounts for existing assets", func(t *testing.T) {
+		store.RecordAmount("Cryptos")
+
+		got := store.GetAssetAmount("Cryptos")
+		want := 71.0
+		assertAmountEquals(t, got, want)
 	})
 }
 
-func assertAssetAmount(t testing.TB, got, want float64) {
+func assertAmountEquals(t testing.TB, got, want float64) {
 	t.Helper()
 	if got != want {
 		t.Errorf("got %f want %f", got, want)
 	}
+}
+
+func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
+	t.Helper()
+
+	tmpfile, err := ioutil.TempFile("", "db")
+
+	if err != nil {
+		t.Fatalf("could not create temp file %v", err)
+	}
+
+	tmpfile.Write([]byte(initialData))
+
+	removeFile := func() {
+		tmpfile.Close()
+		os.Remove(tmpfile.Name())
+	}
+
+	return tmpfile, removeFile
 }
